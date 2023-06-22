@@ -39,7 +39,7 @@ client.on('message', message => {
 
 client.initialize();
 
-const server = https.createServer(app);
+const server = https.createServer(options, app);
 
 app.get('/', (req,res) => {
 	res.send('Whatsapp BOT');
