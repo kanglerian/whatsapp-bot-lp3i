@@ -33,7 +33,7 @@ client.on('message', message => {
 client.initialize();
 
 app.get('/', (req,res) => {
-	res.send('Whatsapp BOT');
+	res.send('Whatsapp BOT Ready');
 })
 
 app.post('/send', (req, res) => {
