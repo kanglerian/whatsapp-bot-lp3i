@@ -30,6 +30,10 @@ client.on('message', message => {
 	}
 });
 
+client.on('disconnected', (reason) => {
+	client.initialize();
+})
+
 client.initialize();
 
 app.get('/', (req,res) => {
@@ -44,7 +48,7 @@ app.post('/send', (req, res) => {
 		});
 		statePromise.then( async (value) => {
 			if(value === 'CONNECTED'){
-				let target = '6287861604530@c.us';
+				let target = req.body.target;
 				let data = {
 					name: req.body.name,
 					whatsapp: req.body.whatsapp
