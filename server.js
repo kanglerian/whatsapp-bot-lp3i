@@ -1,15 +1,8 @@
 const qrcode = require('qrcode-terminal');
 const express = require('express');
 const cors = require('cors');
-const https = require('https');
-const fs = require('fs');
 const app = express();
-const port = 443;
-
-const options = {
-  key: fs.readFileSync('./key.key'),
-  cert: fs.readFileSync('./cert.crt')
-};
+const port = 3031;
 
 app.use(cors());
 app.use(express.json());
@@ -38,8 +31,6 @@ client.on('message', message => {
 });
 
 client.initialize();
-
-const server = https.createServer(options, app);
 
 app.get('/', (req,res) => {
 	res.send('Whatsapp BOT');
@@ -78,6 +69,6 @@ app.post('/send', (req, res) => {
 	}
 })
 
-server.listen(port, () => {
+app.listen(port, () => {
 	console.log(`http://localhost:${port}`);
 })
