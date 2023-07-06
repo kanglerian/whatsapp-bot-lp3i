@@ -23,8 +23,8 @@ RUN npm install
 # Salin kode aplikasi ke direktori kerja
 COPY . .
 
-# Expose port 3032 untuk aplikasi
-EXPOSE 3031
+# Expose port 4002 untuk aplikasi
+EXPOSE 4002
 
 # Menjalankan aplikasi saat container dijalankan
 CMD ["npm", "start"]
