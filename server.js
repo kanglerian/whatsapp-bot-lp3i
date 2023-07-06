@@ -2,7 +2,7 @@ const qrcode = require('qrcode-terminal');
 const express = require('express');
 const cors = require('cors');
 const app = express();
-const port = 4001;
+const port = 4002;
 
 app.use(cors());
 app.use(express.json());
@@ -37,7 +37,9 @@ client.on('disconnected', (reason) => {
 client.initialize();
 
 app.get('/', (req,res) => {
-	res.send('Whatsapp BOT Ready');
+	return res.json({
+		title: 'Whatsapp BOT Ready'
+	});
 })
 
 app.post('/send', (req, res) => {
