@@ -37,9 +37,7 @@ client.on('disconnected', (reason) => {
 client.initialize();
 
 app.get('/', (req,res) => {
-	return res.json({
-		title: 'Whatsapp BOT Ready'
-	});
+	return res.send('Whatsapp BOT Ready 1 🇮🇩');
 })
 
 app.post('/send', (req, res) => {
