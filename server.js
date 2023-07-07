@@ -25,9 +25,7 @@ client.on('ready', () => {
 });
 
 client.on('message', message => {
-	if(message.body === '!ping') {
-		message.reply('pong');
-	}
+	console.log(message);
 });
 
 client.on('disconnected', (reason) => {
