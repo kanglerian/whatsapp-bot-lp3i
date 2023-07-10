@@ -4,6 +4,8 @@ const cors = require('cors');
 const app = express();
 const port = 4002;
 
+const { Pengaduan } = require('./models');
+
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -71,6 +73,15 @@ app.post('/send', (req, res) => {
 	}
 });
 
+app.get('/report', async (req, res) => {
+	try {
+		const pengaduan = await Pengaduan.findAll();
+		return res.status(200).json(pengaduan);
+	} catch (error) {
+		console.log(error);
+	}
+});
+
 app.post('/report', (req, res) => {
 	try {
 		const state = client.getState();
@@ -80,8 +91,17 @@ app.post('/report', (req, res) => {
 		statePromise.then( async (value) => {
 			if(value === 'CONNECTED'){
 				let target = req.body.target;
+				let title = req.body.title;
+				let division = req.body.division;
 				let message = req.body.message;
-				client.sendMessage(target, message);
+				let messageSend = req.body.messageSend;
+				client.sendMessage(target, messageSend);
+				let data = {
+					title: title,
+					division: division,
+					message: message
+				}
+				await Pengaduan.create(data);
 				return res.json({
 					status: true
 				})
