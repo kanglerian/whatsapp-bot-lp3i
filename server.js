@@ -69,7 +69,36 @@ app.post('/send', (req, res) => {
 	} catch (error) {
 		console.log(error);
 	}
-})
+});
+
+app.post('/report', (req, res) => {
+	try {
+		const state = client.getState();
+		const statePromise = new Promise((resolve, reject) => {
+			resolve(state);
+		});
+		statePromise.then( async (value) => {
+			if(value === 'CONNECTED'){
+				let target = req.body.target;
+				let message = req.body.message;
+				client.sendMessage(target, message);
+				return res.json({
+					status: true
+				})
+			}else{
+				console.log(false)
+				return res.json({
+					status: false
+				})
+			}
+		})
+		.catch((error) => {
+			console.log(error);
+		})
+	} catch (error) {
+		console.log(error);
+	}
+});
 
 app.listen(port, () => {
 	console.log(`http://localhost:${port}`);
