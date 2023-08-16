@@ -10,12 +10,16 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-const { Client, LocalAuth } = require('whatsapp-web.js');
+const { Client, LocalAuth } = require('whatsapp-lerian');
 const client = new Client({
 	authStrategy: new LocalAuth(),
 	puppeteer: {
 		args: ['--no-sandbox', '--disable-setuid-sandbox'],
-	}
+	},
+	webVersionCache: {
+    type: 'remote',
+    remotePath: 'https://raw.githubusercontent.com/wppconnect-team/wa-version/main/html/2.2332.15.html'
+  },
 });
 
 client.on('qr', qr => {
