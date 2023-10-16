@@ -49,6 +49,7 @@ app.post('/send', (req, res) => {
 		statePromise.then(async (value) => {
 			if (value === 'CONNECTED') {
 				let target = req.body.target;
+				console.log(target);
 				let data = {
 					name: req.body.name,
 					school: req.body.school,
