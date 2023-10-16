@@ -55,9 +55,9 @@ app.post('/send', (req, res) => {
 					school: req.body.school,
 					whatsapp: req.body.whatsapp
 				}
-				let message = `*Data terbaru dari Website LP3I!*\nKami dengan senang hati menginformasikan bahwa data terbaru telah tersedia di website kami:\n\n*Nama lengkap:* ${data.name}\n*Asal sekolah:* ${data.school}\n*Whatsapp:* ${data.whatsapp}\n\nMohon maaf jika pesan ini terkesan otomatis, namun kami ingin memastikan informasi ini tersampaikan dengan tepat dan cepat kepada Anda.\nTerima kasih.`;
+				let message = req.body.message;
 				client.sendMessage(target, message);
-				let feedback = `Halo ${data.name}!\nTerima kasih telah mengisi data, kami senang bisa berkomunikasi dengan Anda. Kami adalah Panitia PMB Politeknik LP3I Kampus Tasikmalaya. Ada yang bisa kami bantu?`;
+				let feedback = req.body.feedback;
 				let phone = phoneNumberFormatter(data.whatsapp);
 				client.sendMessage(phone, feedback);
 				return res.json({
