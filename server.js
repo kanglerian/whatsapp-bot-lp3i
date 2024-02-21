@@ -10,7 +10,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-const { Client, LocalAuth } = require('whatsapp-lerian');
+const { Client, LocalAuth } = require('whatsapp-web.js');
 const client = new Client({
 	authStrategy: new LocalAuth(),
 	puppeteer: {
@@ -49,7 +49,6 @@ app.post('/send', (req, res) => {
 		statePromise.then(async (value) => {
 			if (value === 'CONNECTED') {
 				let target = req.body.target;
-				console.log(target);
 				let data = {
 					name: req.body.name,
 					school: req.body.school,
@@ -64,20 +63,49 @@ app.post('/send', (req, res) => {
 					status: true
 				})
 			} else {
-				console.log(false)
 				return res.json({
 					status: false
 				})
 			}
 		})
 			.catch((error) => {
-				console.log(error);
 				return res.json({
 					status: false
 				})
 			})
 	} catch (error) {
-		console.log(error);
+		return res.json({
+			status: false
+		})
+	}
+});
+
+app.post('/send-general', (req, res) => {
+	try {
+		const state = client.getState();
+		const statePromise = new Promise((resolve, reject) => {
+			resolve(state);
+		});
+		statePromise.then(async (value) => {
+			if (value === 'CONNECTED') {
+				let target = phoneNumberFormatter(req.body.target);
+				let message = req.body.message;
+				client.sendMessage(target, message);
+				return res.json({
+					status: true
+				})
+			} else {
+				return res.json({
+					status: false
+				})
+			}
+		})
+			.catch((error) => {
+				return res.json({
+					status: false
+				})
+			})
+	} catch (error) {
 		return res.json({
 			status: false
 		})
