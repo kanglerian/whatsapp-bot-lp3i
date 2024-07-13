@@ -11,7 +11,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-const { Client, NoAuth, LocalAuth } = require('whatsapp-web.js');
+const { Client, LocalAuth } = require('whatsapp-web.js');
 const client = new Client({
 	authStrategy: new LocalAuth(),
 	puppeteer: {
@@ -30,17 +30,40 @@ client.on('message', async (msg) => {
 		}, 2000);
 		setTimeout(() => {
 			resetPassword(phoneNumberWithoutSuffix(msg.from))
-			.then((response) => {
-				const message = `Password anda telah berhasil direset!\n------\nEmail: ${response.email}\nNo.Whatsapp: ${response.phone}\n------\nPassword anda telah berhasil direset, silahkan login dengan kata sandi Nomor Whatsapp anda. Jangan lupa untuk ganti kata sandi!\n\n@lp3i.tasik\n\nPoliteknik LP3I Kampus Tasikmalaya\nJl. Ir. H. Juanda No.106, Panglayungan, Kec. Cipedes Kota Tasikmalaya, Jawa Barat 46151`
-				client.sendMessage(msg.from, message);
-			})
-			.catch((error) => {
-				console.log(error.response);
-				if(error.response.status == '404'){
-					client.sendMessage(msg.from, error.response.data.message);
-				}
-			});
+				.then((response) => {
+					const message = `Password anda telah berhasil direset!\n------\nEmail: ${response.email}\nNo.Whatsapp: ${response.phone}\n------\nPassword anda telah berhasil direset, silahkan login dengan kata sandi Nomor Whatsapp anda. Jangan lupa untuk ganti kata sandi!\n\n@lp3i.tasik\n\nPoliteknik LP3I Kampus Tasikmalaya\nJl. Ir. H. Juanda No.106, Panglayungan, Kec. Cipedes Kota Tasikmalaya, Jawa Barat 46151`
+					client.sendMessage(msg.from, message);
+				})
+				.catch((error) => {
+					console.log(error.response);
+					if (error.response.status == '404') {
+						client.sendMessage(msg.from, error.response.data.message);
+					}
+				});
 		}, 10000);
+	}
+
+	if (msg.body == 'confirmregistration') {
+		setTimeout(() => {
+			getApplicant(phoneNumberWithoutSuffix(msg.from))
+				.then((response) => {
+					if (response.finish) {
+						const messagePresenter = `Konfirmasi Pendaftaran!\n------\nUUID: ${response.applicant.identity}\nNIK: ${response.applicant.nik}\nNama lengkap: ${response.applicant.name}\nEmail: ${response.applicant.email}\nNo.Whatsapp: ${response.applicant.phone}\nAsal Sekolah: ${response.applicant.school}\nKelas: ${response.applicant.major}/${response.applicant.class}/${response.applicant.year}\n------\nSilahkan untuk segera Follow Up!\n\n@lp3i.tasik\n\nPoliteknik LP3I Kampus Tasikmalaya\nJl. Ir. H. Juanda No.106, Panglayungan, Kec. Cipedes Kota Tasikmalaya, Jawa Barat 46151`
+						const message = `Konfirmasi Pendaftaran Berhasil!\n------\nID: ${response.applicant.identity}\nNIK: ${response.applicant.nik}\nNama lengkap: ${response.applicant.name}\nEmail: ${response.applicant.email}\nNo.Whatsapp: ${response.applicant.phone}\nAsal Sekolah: ${response.applicant.school}\nKelas: ${response.applicant.major}/${response.applicant.class}/${response.applicant.year}\n------\nSilahkan untuk menunggu follow up dari kak ${response.applicant.presenter}!\n\n@lp3i.tasik\n\nPoliteknik LP3I Kampus Tasikmalaya\nJl. Ir. H. Juanda No.106, Panglayungan, Kec. Cipedes Kota Tasikmalaya, Jawa Barat 46151`
+						client.sendMessage(phoneNumberFormatter(response.applicant.no_presenter), messagePresenter);
+						client.sendMessage(msg.from, message);
+					} else {
+						const message = `Mohon maaf data yang anda kirim belum lengkap!`
+						client.sendMessage(msg.from, message);
+					}
+				})
+				.catch((error) => {
+					console.log(error.response);
+					if (error.response.status == '404') {
+						client.sendMessage(msg.from, error.response.data.message);
+					}
+				});
+		}, 3000);
 	}
 });
 
@@ -57,6 +80,17 @@ client.initialize();
 const resetPassword = async (phone) => {
 	try {
 		const responseData = await axios.post(`http://localhost:8000/api/auth/beasiswappo/forgot-password`, {
+			phone: phone
+		});
+		return responseData.data;
+	} catch (error) {
+		throw error;
+	}
+}
+
+const getApplicant = async (phone) => {
+	try {
+		const responseData = await axios.post(`http://localhost:8000/api/beasiswappo/profile/presenter`, {
 			phone: phone
 		});
 		return responseData.data;
