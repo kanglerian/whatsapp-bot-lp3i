@@ -58,7 +58,6 @@ client.on('message', async (msg) => {
 					}
 				})
 				.catch((error) => {
-					console.log(error.response);
 					if (error.response.status == '404') {
 						client.sendMessage(msg.from, error.response.data.message);
 					}
@@ -79,7 +78,7 @@ client.initialize();
 
 const resetPassword = async (phone) => {
 	try {
-		const responseData = await axios.post(`http://localhost:8000/api/auth/beasiswappo/forgot-password`, {
+		const responseData = await axios.post(`https://database.politekniklp3i-tasikmalaya.ac.id/api/beasiswappo/forgot-password`, {
 			phone: phone
 		});
 		return responseData.data;
@@ -90,7 +89,7 @@ const resetPassword = async (phone) => {
 
 const getApplicant = async (phone) => {
 	try {
-		const responseData = await axios.post(`http://localhost:8000/api/beasiswappo/profile/presenter`, {
+		const responseData = await axios.post(`https://database.politekniklp3i-tasikmalaya.ac.id/api/beasiswappo/profile/presenter`, {
 			phone: phone
 		});
 		return responseData.data;
