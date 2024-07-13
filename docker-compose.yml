@@ -1,0 +1,10 @@
+version: "3.7"
+services:
+  web:
+    container_name: whatsapp_container
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "4002:4002"
+    restart: unless-stopped
