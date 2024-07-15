@@ -24,7 +24,7 @@ client.on('qr', qr => {
 });
 
 client.on('message', async (msg) => {
-	if (msg.body == 'resetpass') {
+	if (msg.body.includes(':resetpass:')) {
 		setTimeout(() => {
 			client.sendMessage(msg.from, 'Mohon ditunggu untuk pelayanan reset kata sandi dari kami.');
 		}, 2000);
@@ -43,7 +43,7 @@ client.on('message', async (msg) => {
 		}, 10000);
 	}
 
-	if (msg.body == 'confirmregistration') {
+	if (msg.body.includes(':confirmregistration:')) {
 		setTimeout(() => {
 			getApplicant(phoneNumberWithoutSuffix(msg.from))
 				.then((response) => {
@@ -78,7 +78,7 @@ client.initialize();
 
 const resetPassword = async (phone) => {
 	try {
-		const responseData = await axios.post(`https://database.politekniklp3i-tasikmalaya.ac.id/api/beasiswappo/forgot-password`, {
+		const responseData = await axios.post(`http://localhost:8000/api/beasiswappo/forgot-password`, {
 			phone: phone
 		});
 		return responseData.data;
@@ -89,7 +89,7 @@ const resetPassword = async (phone) => {
 
 const getApplicant = async (phone) => {
 	try {
-		const responseData = await axios.post(`https://database.politekniklp3i-tasikmalaya.ac.id/api/beasiswappo/profile/presenter`, {
+		const responseData = await axios.post(`http://localhost:8000/api/beasiswappo/profile/presenter`, {
 			phone: phone
 		});
 		return responseData.data;
