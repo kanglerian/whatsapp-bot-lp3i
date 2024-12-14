@@ -24,6 +24,7 @@ client.on('qr', qr => {
 });
 
 client.on('message', async (msg) => {
+	console.log(msg.body);
 	if (msg.body.includes(':resetpass:')) {
 		setTimeout(() => {
 			client.sendMessage(msg.from, 'Mohon ditunggu untuk pelayanan reset kata sandi dari kami.');
@@ -31,6 +32,7 @@ client.on('message', async (msg) => {
 		setTimeout(() => {
 			resetPassword(phoneNumberWithoutSuffix(msg.from))
 				.then((response) => {
+					console.log(response);
 					const message = `Password anda telah berhasil direset!\n------\nEmail: ${response.email}\nNo.Whatsapp: ${response.phone}\n------\nPassword anda telah berhasil direset, silahkan login dengan kata sandi Nomor Whatsapp anda. Jangan lupa untuk ganti kata sandi!\n\n@lp3i.tasik\n\nPoliteknik LP3I Kampus Tasikmalaya\nJl. Ir. H. Juanda No.106, Panglayungan, Kec. Cipedes Kota Tasikmalaya, Jawa Barat 46151`
 					client.sendMessage(msg.from, message);
 				})
@@ -47,10 +49,11 @@ client.on('message', async (msg) => {
 		setTimeout(() => {
 			getApplicant(phoneNumberWithoutSuffix(msg.from))
 				.then((response) => {
-					if (response.finish) {
+					console.log(response);
+					if (response.validate.validate) {
 						const messagePresenter = `Konfirmasi Pendaftaran!\n------\nUUID: ${response.applicant.identity}\nNama lengkap: ${response.applicant.name}\nEmail: ${response.applicant.email}\nNo.Whatsapp: ${response.applicant.phone}\nAsal Sekolah: ${response.applicant.school}\nKelas: ${response.applicant.major}/${response.applicant.class}/${response.applicant.year}\n------\nSilahkan untuk segera Follow Up!\n\n@lp3i.tasik\n\nPoliteknik LP3I Kampus Tasikmalaya\nJl. Ir. H. Juanda No.106, Panglayungan, Kec. Cipedes Kota Tasikmalaya, Jawa Barat 46151`
-						const message = `Konfirmasi Pendaftaran Berhasil!\n------\nID: ${response.applicant.identity}\nNIK: ${response.applicant.nik}\nNama lengkap: ${response.applicant.name}\nEmail: ${response.applicant.email}\nNo.Whatsapp: ${response.applicant.phone}\nAsal Sekolah: ${response.applicant.school}\nKelas: ${response.applicant.major}/${response.applicant.class}/${response.applicant.year}\n------\nSilahkan untuk menunggu follow up dari kak ${response.applicant.presenter}!\n\n@lp3i.tasik\n\nPoliteknik LP3I Kampus Tasikmalaya\nJl. Ir. H. Juanda No.106, Panglayungan, Kec. Cipedes Kota Tasikmalaya, Jawa Barat 46151`
-						client.sendMessage(phoneNumberFormatter(response.applicant.no_presenter), messagePresenter);
+						const message = `Konfirmasi Pendaftaran Berhasil!\n------\nID: ${response.applicant.identity}\nNIK: ${response.applicant.nik}\nNama lengkap: ${response.applicant.name}\nEmail: ${response.applicant.email}\nNo.Whatsapp: ${response.applicant.phone}\nAsal Sekolah: ${response.applicant.school}\nKelas: ${response.applicant.major}/${response.applicant.class}/${response.applicant.year}\n------\nSilahkan untuk menunggu follow up dari kak ${response.applicant.presenter.name}!\n\n@lp3i.tasik\n\nPoliteknik LP3I Kampus Tasikmalaya\nJl. Ir. H. Juanda No.106, Panglayungan, Kec. Cipedes Kota Tasikmalaya, Jawa Barat 46151`
+						client.sendMessage(phoneNumberFormatter(response.applicant.presenter.phone), messagePresenter);
 						client.sendMessage(msg.from, message);
 					} else {
 						const message = `Mohon maaf data yang anda kirim belum lengkap!`
@@ -58,6 +61,7 @@ client.on('message', async (msg) => {
 					}
 				})
 				.catch((error) => {
+					console.log(error.response);
 					if (error.response.status == '404') {
 						client.sendMessage(msg.from, error.response.data.message);
 					}
@@ -78,8 +82,12 @@ client.initialize();
 
 const resetPassword = async (phone) => {
 	try {
-		const responseData = await axios.post(`https://database.politekniklp3i-tasikmalaya.ac.id/api/beasiswappo/forgot-password`, {
+		const responseData = await axios.post(`https://pmb-api.politekniklp3i-tasikmalaya.ac.id/auth/forgot/v1`, {
 			phone: phone
+		},{
+			headers: {
+				'lp3i-api-key': 'aEof9XqcH34k3g6IbJcQLxGY'
+			}
 		});
 		return responseData.data;
 	} catch (error) {
@@ -89,8 +97,10 @@ const resetPassword = async (phone) => {
 
 const getApplicant = async (phone) => {
 	try {
-		const responseData = await axios.post(`https://database.politekniklp3i-tasikmalaya.ac.id/api/beasiswappo/profile/presenter`, {
-			phone: phone
+		const responseData = await axios.get(`https://pmb-api.politekniklp3i-tasikmalaya.ac.id/profiles/phone/${phone}/v1`, {
+			headers: {
+				'lp3i-api-key': 'aEof9XqcH34k3g6IbJcQLxGY'
+			}
 		});
 		return responseData.data;
 	} catch (error) {
